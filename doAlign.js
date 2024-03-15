@@ -4,9 +4,10 @@ const { JP_INPUT_LOCATION, CN_INPUT_LOCATION, DI_INPUT_LOCATION, OUTPUT_LOCATION
 
 const fs = require("fs")
 
-let data = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
+let jpText = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
+let cnText = fs.readFileSync(CN_INPUT_LOCATION, "utf8")
+let diText = fs.readFileSync(DI_INPUT_LOCATION, "utf8")
 
-console.log(data)
 
 let jpData = {
     a1: "あ",
