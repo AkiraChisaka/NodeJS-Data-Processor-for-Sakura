@@ -1,7 +1,5 @@
-
-
-function logStuff (stuff) {
-  console.log(stuff)
+function logStuff(stuff) {
+    console.log(stuff)
 }
 
-module.exports.logStuff = logStuff;
+module.exports.logStuff = logStuff

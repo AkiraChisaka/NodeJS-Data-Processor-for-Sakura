@@ -8,6 +8,4 @@ class MyClass {
     }
 }
 
-
-
-module.exports = MyClass;
+module.exports = MyClass
