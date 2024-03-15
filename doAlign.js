@@ -4,10 +4,17 @@ const { JP_INPUT_LOCATION, CN_INPUT_LOCATION, DI_INPUT_LOCATION, OUTPUT_LOCATION
 
 const fs = require("fs")
 
-// To read the file
-const data = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
+let data = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
+
 console.log(data)
 
-// To write the file
-fs.writeFileSync(OUTPUT_LOCATION, data, "utf8")
-//file written successfully
+let jpData = {
+    a1: "あ",
+    a2: "い",
+    b: {
+        b1: "う",
+        b2: "え",
+    },
+}
+
+fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(jpData, null, 2), "utf8")
