@@ -37,28 +37,11 @@ let jpText = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
 let cnText = fs.readFileSync(CN_INPUT_LOCATION, "utf8")
 let diText = fs.readFileSync(DI_INPUT_LOCATION, "utf8")
 
-let jpLines = jpText.replace(/\r\n/g, "\n").split("\n")
-let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
-let diLines = diText.replace(/\r\n/g, "\n").split("\n")
-
 // console.debug(jpText)
 
 // console.assert(false, "Assertion failed")
 
-if (jpLines.length !== cnLines.length) {
-    console.error("JP and CN texts have different number of lines")
-    process.exit(1)
-}
-
-length = jpLines.length
-
-for (let i = 0; i < length; i++) {
-    outputJSON.data.push({
-        id_line: i + 1,
-        ja_text: jpLines[i],
-        zh_text: cnLines[i],
-    })
-}
+addTextToJSON(jpText, cnText)
 
 // let jpData = {
 //     a1: "あ",
@@ -70,3 +53,23 @@ for (let i = 0; i < length; i++) {
 // }
 
 fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
+
+function addTextToJSON(jpText, cnText) {
+    let jpLines = jpText.replace(/\r\n/g, "\n").split("\n")
+    let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
+
+    if (jpLines.length !== cnLines.length) {
+        console.error("JP and CN texts have different number of lines")
+        process.exit(1)
+    }
+
+    length = jpLines.length
+
+    for (let i = 0; i < length; i++) {
+        outputJSON.data.push({
+            id_line: i + 1,
+            ja_text: jpLines[i],
+            zh_text: cnLines[i],
+        })
+    }
+}
