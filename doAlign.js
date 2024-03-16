@@ -32,28 +32,24 @@ let outputJSON = {
     ],
 }
 
+// Main
+
 let jpText = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
 let cnText = fs.readFileSync(CN_INPUT_LOCATION, "utf8")
 let diText = fs.readFileSync(DI_INPUT_LOCATION, "utf8")
 
 // console.log(jpText)
 
-addTextToJSON(jpText, cnText)
+outputJSON.data.push(...convertTextToJSON(jpText, cnText))
 
-addDictToJSON(diText)
-
-// let jpData = {
-//     a1: "あ",
-//     a2: "い",
-//     b: {
-//         b1: "う",
-//         b2: "え",
-//     },
-// }
+outputJSON.gpt_dict.push(...convertDictToJSON(diText))
 
 fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
 
-function addTextToJSON(jpText, cnText) {
+// End of main
+
+function convertTextToJSON(jpText, cnText) {
+    let data = []
     let jpLines = jpText.replace(/\r\n/g, "\n").split("\n")
     let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
 
@@ -65,17 +61,20 @@ function addTextToJSON(jpText, cnText) {
     length = jpLines.length
 
     for (let i = 0; i < length; i++) {
-        outputJSON.data.push({
+        data.push({
             id_line: i + 1,
             ja_text: jpLines[i],
             zh_text: cnLines[i],
         })
     }
+
+    return data
 }
 
-function addDictToJSON(diText) {
+function convertDictToJSON(diText) {
+    let dict = []
     let diLines = diText.replace(/\r\n/g, "\n").split("\n")
-    console.log(diLines)
+    // console.log(diLines)
 
     diLines.forEach((line) => {
         let parts = line.split("==")
@@ -85,10 +84,12 @@ function addDictToJSON(diText) {
         let dst = parts[0].trim().replace(/\t/g, "")
         let info = parts[1].trim().replace(/\t/g, "")
 
-        outputJSON.gpt_dict.push({
+        dict.push({
             src: src,
             dst: dst,
             info: info,
         })
     })
+
+    return dict
 }
