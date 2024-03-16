@@ -1,12 +1,11 @@
 require("dotenv").config()
-
-const { JP_INPUT_LOCATION, CN_INPUT_LOCATION, DI_INPUT_LOCATION, OUTPUT_LOCATION } = process.env
-
 const fs = require("fs")
+const { JP_INPUT_LOCATION, CN_INPUT_LOCATION, DI_INPUT_LOCATION, OUTPUT_LOCATION } = process.env
 
 let outputJSON = {
     id_novel: 1,
     gpt_dict: [
+        // Examples
         // {
         //     src: "",
         //     dst: "",
@@ -37,11 +36,11 @@ let jpText = fs.readFileSync(JP_INPUT_LOCATION, "utf8")
 let cnText = fs.readFileSync(CN_INPUT_LOCATION, "utf8")
 let diText = fs.readFileSync(DI_INPUT_LOCATION, "utf8")
 
-// console.debug(jpText)
-
-// console.assert(false, "Assertion failed")
+// console.log(jpText)
 
 addTextToJSON(jpText, cnText)
+
+addDictToJSON(diText)
 
 // let jpData = {
 //     a1: "あ",
@@ -72,4 +71,24 @@ function addTextToJSON(jpText, cnText) {
             zh_text: cnLines[i],
         })
     }
+}
+
+function addDictToJSON(diText) {
+    let diLines = diText.replace(/\r\n/g, "\n").split("\n")
+    console.log(diLines)
+
+    diLines.forEach((line) => {
+        let parts = line.split("==")
+        let src = parts[0].trim().replace(/\t/g, "")
+
+        parts = parts[1].split("--")
+        let dst = parts[0].trim().replace(/\t/g, "")
+        let info = parts[1].trim().replace(/\t/g, "")
+
+        outputJSON.gpt_dict.push({
+            src: src,
+            dst: dst,
+            info: info,
+        })
+    })
 }
