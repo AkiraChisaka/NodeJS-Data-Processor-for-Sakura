@@ -54,8 +54,7 @@ function convertTextToJSON(jpText, cnText) {
     let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
 
     if (jpLines.length !== cnLines.length) {
-        console.error("JP and CN texts have different number of lines")
-        process.exit(1)
+        throw new Error("JP and CN texts have different number of lines")
     }
 
     length = jpLines.length
