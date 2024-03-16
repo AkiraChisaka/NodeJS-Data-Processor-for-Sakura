@@ -25,10 +25,13 @@ function main() {
         try {
             var { text_data, ja_char_count, zh_char_count } = convertTextToJSON(jpText, cnText)
             var { gpt_dict } = convertDictToJSON(diText)
+            console.log(gpt_dict)
         } catch (error) {
             console.error(novelName)
             throw error
         }
+
+        console.log(gpt_dict)
 
         return {
             id_novel: index + 1,
@@ -79,10 +82,10 @@ function convertTextToJSON(jpText, cnText) {
 
 function convertDictToJSON(diText) {
     if (diText === "") {
-        return { dict: [] }
+        return { gpt_dict: [] }
     }
 
-    let dict = []
+    let gpt_dict = []
     let diLines = diText.replace(/\r\n/g, "\n").split("\n")
     // console.log(diLines)
 
@@ -95,15 +98,15 @@ function convertDictToJSON(diText) {
             let dst = parts[0].trim().replace(/\t/g, "")
             let info = parts[1].trim().replace(/\t/g, "")
 
-            dict.push({
+            gpt_dict.push({
                 src: src,
                 dst: dst,
                 info: info,
             })
         })
     } catch (error) {
-        return { dict: [] }
+        return { gpt_dict: [] }
     }
 
-    return { dict }
+    return { gpt_dict }
 }
