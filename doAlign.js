@@ -3,36 +3,36 @@ const fs = require("fs")
 const path = require("path")
 const { JP_INPUT_LOCATION, CN_INPUT_LOCATION, DI_INPUT_LOCATION, INPUT_LOCATION, OUTPUT_LOCATION } = process.env
 
-// Main
+main()
 
-let filenames = fs.readdirSync(INPUT_LOCATION)
-let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
+function main() {
+    let filenames = fs.readdirSync(INPUT_LOCATION)
+    let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
 
-let novels = novelNames.map((novelName, index) => {
-    let jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
-    let cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
-    let diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
+    let novels = novelNames.map((novelName, index) => {
+        let jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
+        let cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
+        let diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
 
-    let text_data = convertTextToJSON(jpText, cnText)
-    let gpt_dict = convertDictToJSON(diText)
+        let text_data = convertTextToJSON(jpText, cnText)
+        let gpt_dict = convertDictToJSON(diText)
 
-    return {
-        id_novel: index + 1,
-        line_count: text_data.length,
-        gpt_dict: gpt_dict,
-        text_data: text_data,
+        return {
+            id_novel: index + 1,
+            line_count: text_data.length,
+            gpt_dict: gpt_dict,
+            text_data: text_data,
+        }
+    })
+
+    let outputJSON = {
+        novel_count: novels.length,
+        line_count_total: novels.reduce((total, novel) => total + novel.line_count, 0),
+        data: novels,
     }
-})
 
-let outputJSON = {
-    novel_count: novels.length,
-    line_count_total: novels.reduce((total, novel) => total + novel.line_count, 0),
-    data: novels,
+    fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
 }
-
-fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
-
-// End of main
 
 function convertTextToJSON(jpText, cnText) {
     let data = []
