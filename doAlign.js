@@ -1,7 +1,15 @@
-require("dotenv").config()
 const fs = require("fs")
 const path = require("path")
-const { INPUT_LOCATION, OUTPUT_LOCATION } = process.env
+
+const config = JSON.parse(fs.readFileSync("config.json", "utf8"))
+
+for (const location of config.locations) {
+    console.log(`Input: ${location.input}`)
+    console.log(`Output: ${location.output}`)
+}
+
+const INPUT_LOCATION = config.locations[0].input
+const OUTPUT_LOCATION = config.locations[0].output
 
 main()
 
