@@ -2,14 +2,13 @@ const fs = require("fs")
 const path = require("path")
 
 const config = JSON.parse(fs.readFileSync("config.json", "utf8"))
-
-for (const location of config.locations) {
-    console.log(`Input: ${location.input}`)
-    console.log(`Output: ${location.output}`)
-}
-
 const INPUT_LOCATION = config.locations[0].input
 const OUTPUT_LOCATION = config.locations[0].output
+
+// for (const location of config.locations) {
+//     console.log(`Input: ${location.input}`)
+//     console.log(`Output: ${location.output}`)
+// }
 
 main()
 
@@ -17,39 +16,49 @@ function main() {
     let filenames = fs.readdirSync(INPUT_LOCATION)
     let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
 
-    let novels = novelNames.map((novelName, index) => {
-        let jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
-        let cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
+    let novels = novelNames
+        .map((novelName, index) => {
+            let jpText = ""
+            let cnText = ""
+            try {
+                jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
+                cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
+            } catch (error) {
+                if (error.code === "ENOENT") {
+                    return
+                }
+            }
 
-        let diText = ""
-        try {
-            diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
-        } catch (error) {
-            if (error.code !== "ENOENT") {
+            let diText = ""
+            try {
+                diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
+            } catch (error) {
+                if (error.code !== "ENOENT") {
+                    throw error
+                }
+            }
+
+            try {
+                var [textData, jpCharCount, cnCharCount] = convertTextToJSON(jpText, cnText)
+                var [dictData] = convertDictToJSON(diText)
+                // console.log(dictData)
+            } catch (error) {
+                console.error(novelName)
                 throw error
             }
-        }
 
-        try {
-            var [textData, jpCharCount, cnCharCount] = convertTextToJSON(jpText, cnText)
-            var [dictData] = convertDictToJSON(diText)
-            console.log(dictData)
-        } catch (error) {
-            console.error(novelName)
-            throw error
-        }
+            // console.log(gpt_dict)
 
-        // console.log(gpt_dict)
-
-        return {
-            id_novel: index + 1,
-            line_count: textData.length,
-            ja_char_count: jpCharCount,
-            zh_char_count: cnCharCount,
-            gpt_dict: dictData,
-            text_data: textData,
-        }
-    })
+            return {
+                id_novel: index + 1,
+                line_count: textData.length,
+                ja_char_count: jpCharCount,
+                zh_char_count: cnCharCount,
+                gpt_dict: dictData,
+                text_data: textData,
+            }
+        })
+        .filter(Boolean)
 
     let outputJSON = {
         schema_version: config.schema_version,
