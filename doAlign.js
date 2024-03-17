@@ -14,8 +14,19 @@ main()
 
 function main() {
     let filenames = fs.readdirSync(INPUT_LOCATION)
-    let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
+    let commonDiText = ""
+    try {
+        commonDiText = fs.readFileSync(path.join(INPUT_LOCATION, `Common DI.txt`), "utf8")
+        console.log(`Common dictionary found at ${INPUT_LOCATION}`)
+    } catch (error) {
+        if (error.code === "ENOENT") {
+            console.warn(`No common dictionary found at ${INPUT_LOCATION}`)
+        } else {
+            throw error
+        }
+    }
 
+    let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
     let novels = novelNames
         .map((novelName, index) => {
             let jpText = ""
@@ -25,7 +36,10 @@ function main() {
                 cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
             } catch (error) {
                 if (error.code === "ENOENT") {
+                    console.warn(`No JP/CN text found for ${novelName}`)
                     return
+                } else {
+                    throw error
                 }
             }
 
@@ -33,9 +47,15 @@ function main() {
             try {
                 diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
             } catch (error) {
-                if (error.code !== "ENOENT") {
+                if (error.code === "ENOENT") {
+                    console.warn(`No dictionary file found for ${novelName}`)
+                } else {
                     throw error
                 }
+            }
+
+            if (commonDiText) {
+                diText = diText + "\n" + commonDiText
             }
 
             try {
