@@ -23,8 +23,8 @@ function main() {
         }
 
         try {
-            var { text_data, ja_char_count, zh_char_count } = convertTextToJSON(jpText, cnText)
-            var { gpt_dict } = convertDictToJSON(diText)
+            var [text_data, ja_char_count, zh_char_count] = convertTextToJSON(jpText, cnText)
+            var [gpt_dict] = convertDictToJSON(diText)
             console.log(gpt_dict)
         } catch (error) {
             console.error(novelName)
@@ -54,8 +54,14 @@ function main() {
     fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
 }
 
+/**
+ *
+ * @param {*} jpText
+ * @param {*} cnText
+ * @returns An array containing the text data stored as an array, and the character count for both languages
+ */
 function convertTextToJSON(jpText, cnText) {
-    let text_data = []
+    let data = []
     let ja_char_count = 0
     let zh_char_count = 0
 
@@ -68,7 +74,7 @@ function convertTextToJSON(jpText, cnText) {
 
     let length = jpLines.length
     for (let i = 0; i < length; i++) {
-        text_data.push({
+        data.push({
             id_line: i + 1,
             ja_text: jpLines[i],
             zh_text: cnLines[i],
@@ -77,15 +83,21 @@ function convertTextToJSON(jpText, cnText) {
         zh_char_count += cnLines[i].length
     }
 
-    return { text_data, ja_char_count, zh_char_count }
+    return [data, ja_char_count, zh_char_count]
 }
 
+/**
+ *
+ * @param {*} diText
+ * @returns An array containing only the dictionary data, which is also an array
+ */
 function convertDictToJSON(diText) {
+    let dict = []
+
     if (diText === "") {
-        return { gpt_dict: [] }
+        return [dict]
     }
 
-    let gpt_dict = []
     let diLines = diText.replace(/\r\n/g, "\n").split("\n")
     // console.log(diLines)
 
@@ -98,15 +110,15 @@ function convertDictToJSON(diText) {
             let dst = parts[0].trim().replace(/\t/g, "")
             let info = parts[1].trim().replace(/\t/g, "")
 
-            gpt_dict.push({
+            dict.push({
                 src: src,
                 dst: dst,
                 info: info,
             })
         })
     } catch (error) {
-        return { gpt_dict: [] }
+        return [dict]
     }
 
-    return { gpt_dict }
+    return [dict]
 }
