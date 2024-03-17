@@ -52,7 +52,7 @@ function main() {
     })
 
     let outputJSON = {
-        schema_version: "Akira v1.000",
+        schema_version: config.schema_version,
         novel_count: novels.length,
         line_count_total: novels.reduce((total, novel) => total + novel.line_count, 0),
         ja_char_count_total: novels.reduce((total, novel) => total + novel.ja_char_count, 0),
