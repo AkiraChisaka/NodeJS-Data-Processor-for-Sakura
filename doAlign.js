@@ -20,8 +20,8 @@ function main() {
     let novels = novelNames.map((novelName, index) => {
         let jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
         let cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
-        let diText = ""
 
+        let diText = ""
         try {
             diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
         } catch (error) {
@@ -31,23 +31,23 @@ function main() {
         }
 
         try {
-            var [text_data, ja_char_count, zh_char_count] = convertTextToJSON(jpText, cnText)
-            var [gpt_dict] = convertDictToJSON(diText)
-            console.log(gpt_dict)
+            var [textData, jpCharCount, cnCharCount] = convertTextToJSON(jpText, cnText)
+            var [dictData] = convertDictToJSON(diText)
+            console.log(dictData)
         } catch (error) {
             console.error(novelName)
             throw error
         }
 
-        console.log(gpt_dict)
+        // console.log(gpt_dict)
 
         return {
             id_novel: index + 1,
-            line_count: text_data.length,
-            ja_char_count,
-            zh_char_count,
-            gpt_dict,
-            text_data,
+            line_count: textData.length,
+            ja_char_count: jpCharCount,
+            zh_char_count: cnCharCount,
+            gpt_dict: dictData,
+            text_data: textData,
         }
     })
 
@@ -71,8 +71,8 @@ function main() {
  */
 function convertTextToJSON(jpText, cnText) {
     let data = []
-    let ja_char_count = 0
-    let zh_char_count = 0
+    let jpCharCount = 0
+    let cnCharCount = 0
 
     let jpLines = jpText.replace(/\r\n/g, "\n").split("\n")
     let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
@@ -88,11 +88,11 @@ function convertTextToJSON(jpText, cnText) {
             ja_text: jpLines[i],
             zh_text: cnLines[i],
         })
-        ja_char_count += jpLines[i].length
-        zh_char_count += cnLines[i].length
+        jpCharCount += jpLines[i].length
+        cnCharCount += cnLines[i].length
     }
 
-    return [data, ja_char_count, zh_char_count]
+    return [data, jpCharCount, cnCharCount]
 }
 
 /**
