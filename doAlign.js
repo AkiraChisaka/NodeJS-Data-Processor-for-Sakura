@@ -26,6 +26,10 @@ function main() {
         }
     }
 
+    if (filenames.includes("Common DI.txt")) {
+        filenames = filenames.filter((filename) => filename !== "Common DI.txt")
+    }
+
     let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
     let novels = novelNames
         .map((novelName, index) => {
