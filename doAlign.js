@@ -1,22 +1,22 @@
 const fs = require("fs")
 const path = require("path")
 
-const config = JSON.parse(fs.readFileSync("config.json", "utf8"))
-const INPUT_LOCATION = config.locations[0].input
-const OUTPUT_LOCATION = config.locations[0].output
+const config = JSON.parse(fs.readFileSync("config.json", "utf8")) // Read the contents of the config.json file and parse it as JSON
+const INPUT_LOCATION = config.locations[0].input // Get the input location from the config
+const OUTPUT_LOCATION = config.locations[0].output // Get the output location from the config
 
 for (const location of config.locations) {
-    console.log(`Input: ${location.input}`)
-    console.log(`Output: ${location.output}`)
+    console.log(`Input: ${location.input}`) // Log the input location
+    console.log(`Output: ${location.output}`) // Log the output location
 }
 
-main()
+main() // Call the main function
 
 function main() {
-    let filenames = fs.readdirSync(INPUT_LOCATION)
+    let filenames = fs.readdirSync(INPUT_LOCATION) // Read the list of filenames in the input location synchronously
     let commonDiText = ""
     try {
-        commonDiText = fs.readFileSync(path.join(INPUT_LOCATION, `Common DI.txt`), "utf8")
+        commonDiText = fs.readFileSync(path.join(INPUT_LOCATION, `Common DI.txt`), "utf8") // Read the contents of the Common DI.txt file
         console.log(`Common dictionary found at ${INPUT_LOCATION}`)
     } catch (error) {
         if (error.code === "ENOENT") {
@@ -27,17 +27,17 @@ function main() {
     }
 
     if (filenames.includes("Common DI.txt")) {
-        filenames = filenames.filter((filename) => filename !== "Common DI.txt")
+        filenames = filenames.filter((filename) => filename !== "Common DI.txt") // Remove "Common DI.txt" from the list of filenames
     }
 
-    let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))]
+    let novelNames = [...new Set(filenames.map((filename) => filename.slice(0, -7)))] // Extract novel names from filenames
     let novels = novelNames
         .map((novelName, index) => {
             let jpText = ""
             let cnText = ""
             try {
-                jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8")
-                cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8")
+                jpText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} JP.txt`), "utf8") // Read the JP text file for the current novel
+                cnText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} CN.txt`), "utf8") // Read the CN text file for the current novel
             } catch (error) {
                 if (error.code === "ENOENT") {
                     console.warn(`No JP/CN text found for ${novelName}`)
@@ -49,7 +49,7 @@ function main() {
 
             let diText = ""
             try {
-                diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8")
+                diText = fs.readFileSync(path.join(INPUT_LOCATION, `${novelName} DI.txt`), "utf8") // Read the dictionary file for the current novel
             } catch (error) {
                 if (error.code === "ENOENT") {
                     console.warn(`No dictionary file found for ${novelName}`)
@@ -59,19 +59,16 @@ function main() {
             }
 
             if (commonDiText) {
-                diText = diText + "\n" + commonDiText
+                diText = diText + "\n" + commonDiText // Append the common dictionary text to the current novel's dictionary text
             }
 
             try {
-                var [textData, jpCharCount, cnCharCount] = convertTextToJSON(jpText, cnText)
-                var [dictData] = convertDictToJSON(diText)
-                // console.log(dictData)
+                var [textData, jpCharCount, cnCharCount] = convertTextToJSON(jpText, cnText) // Convert JP and CN text to JSON format
+                var [dictData] = convertDictToJSON(diText) // Convert dictionary text to JSON format
             } catch (error) {
                 console.error(novelName)
                 throw error
             }
-
-            // console.log(gpt_dict)
 
             return {
                 id_novel: index + 1,
@@ -93,7 +90,7 @@ function main() {
         data: novels,
     }
 
-    fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8")
+    fs.writeFileSync(OUTPUT_LOCATION, JSON.stringify(outputJSON, null, 2), "utf8") // Write the output JSON to the specified location
 }
 
 /**
@@ -107,8 +104,8 @@ function convertTextToJSON(jpText, cnText) {
     let jpCharCount = 0
     let cnCharCount = 0
 
-    let jpLines = jpText.replace(/\r\n/g, "\n").split("\n")
-    let cnLines = cnText.replace(/\r\n/g, "\n").split("\n")
+    let jpLines = jpText.replace(/\r\n/g, "\n").split("\n") // Split JP text into lines
+    let cnLines = cnText.replace(/\r\n/g, "\n").split("\n") // Split CN text into lines
 
     if (jpLines.length !== cnLines.length) {
         throw new Error("JP and CN texts have different number of lines")
@@ -140,8 +137,7 @@ function convertDictToJSON(diText) {
         return [dict]
     }
 
-    let diLines = diText.replace(/\r\n/g, "\n").split("\n")
-    // console.log(diLines)
+    let diLines = diText.replace(/\r\n/g, "\n").split("\n") // Split dictionary text into lines
 
     try {
         diLines.forEach((line) => {
