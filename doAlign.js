@@ -5,10 +5,10 @@ const config = JSON.parse(fs.readFileSync("config.json", "utf8"))
 const INPUT_LOCATION = config.locations[0].input
 const OUTPUT_LOCATION = config.locations[0].output
 
-// for (const location of config.locations) {
-//     console.log(`Input: ${location.input}`)
-//     console.log(`Output: ${location.output}`)
-// }
+for (const location of config.locations) {
+    console.log(`Input: ${location.input}`)
+    console.log(`Output: ${location.output}`)
+}
 
 main()
 
